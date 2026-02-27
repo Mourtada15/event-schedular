@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --font-heading: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+
+  --color-text-900: #173349;
+  --color-text-800: #1f4e58;
+  --color-text-700: #3f5a6b;
+  --color-text-600: #58727a;
+  --color-text-500: #5f7786;
+
+  --color-bg-cool-100: #f9fcff;
+  --color-bg-cool-200: #f4f8fb;
+  --color-bg-cool-210: #eef7f6;
+  --color-bg-cool-220: #f6faf9;
+  --color-bg-cool-230: #f3f8f2;
+  --color-bg-cool-240: #eff6fb;
+  --color-bg-cool-250: #f2fbfc;
+  --color-bg-cool-260: #f5fcff;
+  --color-bg-warm-100: #f7f4ee;
+  --color-bg-warm-200: #f2efe8;
+
+  --color-surface-100: #ffffff;
+  --color-surface-95: rgba(255, 255, 255, 0.95);
+  --color-surface-92: rgba(255, 255, 255, 0.92);
+  --color-surface-90: rgba(255, 255, 255, 0.9);
+  --color-surface-88: rgba(255, 255, 255, 0.88);
+  --color-surface-86: rgba(255, 255, 255, 0.86);
+  --color-surface-84: rgba(255, 255, 255, 0.84);
+  --color-surface-82: rgba(255, 255, 255, 0.82);
+  --color-surface-78: rgba(255, 255, 255, 0.78);
+  --color-surface-76: rgba(255, 255, 255, 0.76);
+  --color-surface-74: rgba(255, 255, 255, 0.74);
+
+  --color-border-100: rgba(23, 51, 73, 0.1);
+  --color-border-200: rgba(23, 51, 73, 0.16);
+  --color-border-300: rgba(23, 51, 73, 0.24);
+  --color-border-400: rgba(23, 51, 73, 0.32);
+  --color-border-500: rgba(23, 51, 73, 0.45);
+
+  --color-primary-800: #0f3f58;
+  --color-primary-700: #124966;
+  --color-primary-600: #185b7f;
+  --color-primary-500: #2f6170;
+  --color-secondary-500: #4dc0c7;
+  --color-secondary-400: #5ec9c1;
+  --color-highlight-300: #b7e36a;
+  --color-accent-500: #ff7a59;
+  --color-accent-600: #f16340;
+  --color-warning-500: #f2b84a;
+  --color-warning-600: #d8a03a;
+  --color-warning-450: #ffcf61;
+  --color-danger-500: #c23e3e;
+  --color-danger-700: #8f2f2f;
+  --color-sky-200: #bde6ff;
+  --color-sky-100: #d4efff;
+
+  --color-nav-950: #0f2b43;
+  --color-nav-900: #122f4c;
+  --color-nav-850: #173958;
+
+  --color-on-dark: #eff8ff;
+  --color-on-primary: #effcfa;
+  --color-on-accent: #3a1d12;
+  --color-on-warning: #4c3400;
+
+  --radius-xs: 0.58rem;
+  --radius-sm: 0.62rem;
+  --radius-md: 0.78rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.1rem;
+
+  --shadow-sm: 0 6px 14px rgba(14, 59, 67, 0.15);
+  --shadow-md: 0 10px 22px rgba(23, 69, 94, 0.12);
+  --shadow-lg: 0 16px 34px rgba(23, 69, 94, 0.12);
+  --shadow-xl: 0 30px 60px rgba(14, 59, 67, 0.15);
+
+  --focus-ring: 0 0 0 0.2rem rgba(24, 91, 127, 0.24);
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text-900);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+a,
+button,
+.btn {
+  transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

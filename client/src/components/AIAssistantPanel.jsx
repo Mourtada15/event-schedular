@@ -28,12 +28,18 @@ export default function AIAssistantPanel({ form, setForm }) {
   }
 
   return (
-    <div className="card">
-      <div className="card-header fw-semibold">AI Assistant</div>
-      <div className="card-body d-grid gap-3">
-        <div>
+    <aside className="event-ai-panel">
+      <div className="event-ai-header">
+        <p className="event-ai-eyebrow">ASSISTANT</p>
+        <h2>AI Copilot</h2>
+        <p>Draft descriptions, agendas, location ideas, and conflict summaries.</p>
+      </div>
+
+      <div className="event-ai-body">
+        <section className="event-ai-block">
+          <p className="event-ai-block-title">Improve Description</p>
           <button
-            className="btn btn-outline-primary btn-sm"
+            className="btn event-ai-btn"
             disabled={loadingAction === 'improve' || !hasTitle}
             title={!hasTitle ? 'Enter a title (at least 2 characters) first' : ''}
             onClick={() =>
@@ -49,19 +55,20 @@ export default function AIAssistantPanel({ form, setForm }) {
           >
             {loadingAction === 'improve' ? 'Working...' : 'Improve Description'}
           </button>
-        </div>
+        </section>
 
-        <div>
-          <label className="form-label small">Attendees count (optional)</label>
+        <section className="event-ai-block">
+          <p className="event-ai-block-title">Generate Agenda</p>
+          <label className="event-ai-label">Attendees count (optional)</label>
           <input
-            className="form-control form-control-sm mb-2"
+            className="form-control form-control-sm event-ai-input"
             type="number"
             min="1"
             value={agendaInput.attendeesCount}
             onChange={(e) => setAgendaInput({ attendeesCount: e.target.value })}
           />
           <button
-            className="btn btn-outline-primary btn-sm"
+            className="btn event-ai-btn"
             disabled={loadingAction === 'agenda' || !hasTitle || !hasValidDateRange}
             title={!hasTitle ? 'Enter a title first' : !hasValidDateRange ? 'Set a valid start/end time first' : ''}
             onClick={() =>
@@ -82,11 +89,12 @@ export default function AIAssistantPanel({ form, setForm }) {
           >
             {loadingAction === 'agenda' ? 'Working...' : 'Generate Agenda'}
           </button>
-        </div>
+        </section>
 
-        <div>
+        <section className="event-ai-block">
+          <p className="event-ai-block-title">Smart Suggestions</p>
           <button
-            className="btn btn-outline-primary btn-sm"
+            className="btn event-ai-btn"
             disabled={loadingAction === 'suggest' || !hasTitle}
             title={!hasTitle ? 'Enter a title (at least 2 characters) first' : ''}
             onClick={() =>
@@ -105,26 +113,27 @@ export default function AIAssistantPanel({ form, setForm }) {
           </button>
 
           {suggestions && (
-            <div className="small mt-2">
-              <div className="fw-semibold">Location Ideas</div>
-              <ul className="mb-2">
+            <div className="event-ai-results">
+              <div className="event-ai-result-title">Location Ideas</div>
+              <ul className="event-ai-list">
                 {suggestions.locationIdeas.map((idea) => (
                   <li key={idea}>{idea}</li>
                 ))}
               </ul>
-              <div className="fw-semibold">Reminder Plan</div>
-              <ul className="mb-0">
+              <div className="event-ai-result-title">Reminder Plan</div>
+              <ul className="event-ai-list event-ai-list-compact">
                 {suggestions.reminders.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
           )}
-        </div>
+        </section>
 
-        <div>
+        <section className="event-ai-block">
+          <p className="event-ai-block-title">Conflict Check</p>
           <button
-            className="btn btn-outline-primary btn-sm"
+            className="btn event-ai-btn"
             disabled={loadingAction === 'conflict' || !hasValidDateRange}
             title={!hasValidDateRange ? 'Set a valid start/end time first' : ''}
             onClick={() =>
@@ -141,15 +150,15 @@ export default function AIAssistantPanel({ form, setForm }) {
             {loadingAction === 'conflict' ? 'Working...' : 'Conflict Check'}
           </button>
           {!hasTitle || !hasValidDateRange ? (
-            <div className="small text-muted mt-2">
+            <div className="event-ai-note">
               {!hasTitle ? 'AI tools require a title (min 2 characters).' : null}
               {!hasTitle && !hasValidDateRange ? ' ' : null}
               {!hasValidDateRange ? 'Agenda/conflict checks also require a valid start and end time.' : null}
             </div>
           ) : null}
-          {conflictSummary ? <pre className="small mt-2 mb-0">{conflictSummary}</pre> : null}
-        </div>
+          {conflictSummary ? <pre className="event-ai-summary">{conflictSummary}</pre> : null}
+        </section>
       </div>
-    </div>
+    </aside>
   );
 }

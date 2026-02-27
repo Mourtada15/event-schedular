@@ -5,6 +5,7 @@ import AIAssistantPanel from '../components/AIAssistantPanel.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { toIso, toLocalDateTimeInput } from '../utils/date.js';
 import { getErrorMessage } from '../utils/http.js';
+import '../styles/event-form.css';
 
 const initialForm = {
   title: '',
@@ -87,107 +88,146 @@ export default function EventFormPage({ mode }) {
   }
 
   if (loading) {
-    return <div className="text-center py-5">Loading event...</div>;
+    return <div className="event-editor-loading">Loading event workspace...</div>;
   }
 
   return (
-    <div className="row g-4">
-      <div className="col-lg-8">
-        <div className="card">
-          <div className="card-body">
-            <h1 className="h4 mb-3">{mode === 'edit' ? 'Edit Event' : 'Create Event'}</h1>
-            <form onSubmit={handleSubmit} className="d-grid gap-3">
+    <section className="event-editor-shell">
+      <div className="event-editor-blob event-editor-blob-1" />
+      <div className="event-editor-blob event-editor-blob-2" />
+
+      <header className="event-editor-hero">
+        <div>
+          <p className="event-editor-eyebrow">{mode === 'edit' ? 'EVENT STUDIO / EDIT' : 'EVENT STUDIO / NEW'}</p>
+          <h1 className="event-editor-title">{mode === 'edit' ? 'Refine Event Plan' : 'Create New Event'}</h1>
+          <p className="event-editor-subtitle">
+            Build a clear schedule with timing, context, and AI-assisted planning in one workspace.
+          </p>
+        </div>
+        <Link to="/dashboard" className="btn event-editor-back-btn">
+          Back to Dashboard
+        </Link>
+      </header>
+
+      <div className="row g-4 align-items-start">
+        <div className="col-xl-8">
+          <form onSubmit={handleSubmit} className="event-editor-form-card">
+            <section className="event-editor-section">
+              <div className="event-editor-section-head">
+                <p>Event Basics</p>
+              </div>
               <div>
-                <label className="form-label">Title</label>
+                <label className="event-editor-label">Title</label>
                 <input
-                  className="form-control"
+                  className="form-control event-editor-input"
+                  placeholder="Ex: Product Strategy Workshop"
                   value={form.title}
                   onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
                   required
                 />
               </div>
+            </section>
 
+            <section className="event-editor-section">
+              <div className="event-editor-section-head">
+                <p>Schedule</p>
+              </div>
               <div className="row g-3">
                 <div className="col-md-6">
-                  <label className="form-label">Start</label>
+                  <label className="event-editor-label">Start</label>
                   <input
                     type="datetime-local"
-                    className="form-control"
+                    className="form-control event-editor-input"
                     value={form.startAt}
                     onChange={(e) => setForm((prev) => ({ ...prev, startAt: e.target.value }))}
                     required
                   />
                 </div>
                 <div className="col-md-6">
-                  <label className="form-label">End</label>
+                  <label className="event-editor-label">End</label>
                   <input
                     type="datetime-local"
-                    className="form-control"
+                    className="form-control event-editor-input"
                     value={form.endAt}
                     onChange={(e) => setForm((prev) => ({ ...prev, endAt: e.target.value }))}
                     required
                   />
                 </div>
               </div>
+            </section>
 
-              <div>
-                <label className="form-label">Location</label>
-                <input
-                  className="form-control"
-                  value={form.location}
-                  onChange={(e) => setForm((prev) => ({ ...prev, location: e.target.value }))}
-                />
+            <section className="event-editor-section">
+              <div className="event-editor-section-head">
+                <p>Details</p>
               </div>
 
-              <div>
-                <label className="form-label">Status</label>
-                <select
-                  className="form-select"
-                  value={form.status}
-                  onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))}
-                >
-                  <option value="upcoming">upcoming</option>
-                  <option value="attending">attending</option>
-                  <option value="maybe">maybe</option>
-                  <option value="declined">declined</option>
-                </select>
+              <div className="row g-3">
+                <div className="col-md-7">
+                  <label className="event-editor-label">Location</label>
+                  <input
+                    className="form-control event-editor-input"
+                    placeholder="Ex: Conference Room A or Zoom"
+                    value={form.location}
+                    onChange={(e) => setForm((prev) => ({ ...prev, location: e.target.value }))}
+                  />
+                </div>
+
+                <div className="col-md-5">
+                  <label className="event-editor-label">Status</label>
+                  <select
+                    className="form-select event-editor-input"
+                    value={form.status}
+                    onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))}
+                  >
+                    <option value="upcoming">upcoming</option>
+                    <option value="attending">attending</option>
+                    <option value="maybe">maybe</option>
+                    <option value="declined">declined</option>
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label className="form-label">Tags (comma-separated)</label>
+              <div className="mt-3">
+                <label className="event-editor-label">Tags (comma-separated)</label>
                 <input
-                  className="form-control"
+                  className="form-control event-editor-input"
+                  placeholder="team, roadmap, customer"
                   value={form.tags}
                   onChange={(e) => setForm((prev) => ({ ...prev, tags: e.target.value }))}
                 />
               </div>
+            </section>
 
+            <section className="event-editor-section">
+              <div className="event-editor-section-head">
+                <p>Description</p>
+              </div>
               <div>
-                <label className="form-label">Description</label>
+                <label className="event-editor-label">Context and goals</label>
                 <textarea
-                  className="form-control"
+                  className="form-control event-editor-input event-editor-textarea"
                   rows={8}
                   value={form.description}
                   onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
                 />
               </div>
+            </section>
 
-              <div className="d-flex gap-2">
-                <button className="btn btn-primary" disabled={saving}>
-                  {saving ? 'Saving...' : mode === 'edit' ? 'Save Changes' : 'Create Event'}
-                </button>
-                <Link to="/dashboard" className="btn btn-outline-secondary">
-                  Cancel
-                </Link>
-              </div>
-            </form>
-          </div>
+            <div className="event-editor-actions">
+              <button className="btn event-editor-save-btn" disabled={saving}>
+                {saving ? 'Saving...' : mode === 'edit' ? 'Save Changes' : 'Create Event'}
+              </button>
+              <Link to="/dashboard" className="btn event-editor-cancel-btn">
+                Cancel
+              </Link>
+            </div>
+          </form>
+        </div>
+
+        <div className="col-xl-4">
+          <AIAssistantPanel form={form} setForm={setForm} />
         </div>
       </div>
-
-      <div className="col-lg-4">
-        <AIAssistantPanel form={form} setForm={setForm} />
-      </div>
-    </div>
+    </section>
   );
 }

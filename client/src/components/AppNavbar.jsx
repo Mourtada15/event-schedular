@@ -1,6 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
+import '../styles/navbar.css';
 
 export default function AppNavbar() {
   const { user, logout } = useAuth();
@@ -18,41 +19,53 @@ export default function AppNavbar() {
   }
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div className="container">
-        <Link className="navbar-brand" to={user ? '/dashboard' : '/login'}>
-          Event Scheduler
+    <header className="app-nav-shell">
+      <nav className="app-nav container">
+        <Link className="app-nav-brand" to={user ? '/dashboard' : '/login'}>
+          <span className="app-nav-brand-mark">ES</span>
+          <span className="app-nav-brand-text">Event Scheduler</span>
         </Link>
 
-        <div className="ms-auto d-flex align-items-center gap-2">
+        <div className="app-nav-right">
           {user ? (
             <>
-              <Link className="btn btn-sm btn-outline-light" to="/dashboard">
-                Dashboard
-              </Link>
-              <Link className="btn btn-sm btn-outline-light" to="/events/new">
-                New Event
-              </Link>
-              <Link className="btn btn-sm btn-outline-light" to="/invites">
-                Invitations
-              </Link>
-              <span className="text-light small">{user.email}</span>
-              <button className="btn btn-sm btn-warning" onClick={handleLogout}>
+              <div className="app-nav-links">
+                <NavLink
+                  to="/dashboard"
+                  className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''}`}
+                >
+                  Dashboard
+                </NavLink>
+                <NavLink
+                  to="/events/new"
+                  className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''}`}
+                >
+                  New Event
+                </NavLink>
+                <NavLink to="/invites" className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''}`}>
+                  Invitations
+                </NavLink>
+              </div>
+
+              <span className="app-nav-user" title={user.email}>
+                {user.email}
+              </span>
+              <button className="btn app-nav-logout" onClick={handleLogout}>
                 Logout
               </button>
             </>
           ) : (
-            <>
-              <Link className="btn btn-sm btn-outline-light" to="/login">
+            <div className="app-nav-auth-actions">
+              <Link className="btn app-nav-login" to="/login">
                 Login
               </Link>
-              <Link className="btn btn-sm btn-primary" to="/register">
+              <Link className="btn app-nav-register" to="/register">
                 Register
               </Link>
-            </>
+            </div>
           )}
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 }

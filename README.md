@@ -150,7 +150,7 @@ npm run dev:client
 - `NODE_ENV` (`development` or `production`)
 - `PORT` (e.g. `5000`)
 - `MONGO_URI`
-- `CLIENT_ORIGIN` (Vercel URL in prod, local URL in dev)
+- `CLIENT_ORIGIN` (comma-separated allowed origins, e.g. Vercel URL in prod)
 - `JWT_ACCESS_SECRET`
 - `JWT_REFRESH_SECRET`
 - `ACCESS_TOKEN_TTL` (default `15m`)
@@ -185,11 +185,16 @@ npm run dev:client
    - `PORT=10000` (or Render default)
    - `MONGO_URI=<your_mongodb_uri>`
    - `CLIENT_ORIGIN=https://<your-vercel-app>.vercel.app`
-   - `JWT_ACCESS_SECRET=<strong_secret>`
-   - `JWT_REFRESH_SECRET=<strong_secret>`
+   - `JWT_ACCESS_SECRET=<strong_secret_min_32_chars>`
+   - `JWT_REFRESH_SECRET=<strong_secret_min_32_chars>`
    - `COOKIE_SECURE=true`
    - `OPENAI_API_KEY=<optional>`
    - `SMTP_*` variables (optional)
+
+Production startup validation:
+- Server fails fast in production if `CLIENT_ORIGIN` is missing/empty.
+- Server fails fast in production if JWT secrets are default or shorter than 32 characters.
+- Server fails fast in production if `MONGO_URI` is missing.
 
 ## Vercel (Client)
 
@@ -201,7 +206,7 @@ npm run dev:client
 ## Cross-site cookies for Vercel <-> Render
 
 - Server CORS uses:
-  - `origin = CLIENT_ORIGIN`
+  - `origin = CLIENT_ORIGIN` allowlist (comma-separated)
   - `credentials = true`
 - Axios uses `withCredentials: true`
 - In production cookies are set with:

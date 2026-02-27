@@ -2,6 +2,7 @@ import { useState } from 'react';
 import api from '../api/axios.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { getErrorMessage } from '../utils/http.js';
+import '../styles/invitations.css';
 
 export default function InvitationsPage() {
   const toast = useToast();
@@ -35,40 +36,72 @@ export default function InvitationsPage() {
   }
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-lg-8">
-        <div className="card">
-          <div className="card-body">
-            <h1 className="h4 mb-3">Invitations</h1>
-            <form onSubmit={handleCreateInvite} className="d-flex gap-2 mb-3">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Invite by email (optional)"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <button className="btn btn-primary" disabled={creating}>
-                {creating ? 'Creating...' : 'Create Invite'}
-              </button>
+    <section className="invite-shell">
+      <div className="invite-orb invite-orb-1" />
+      <div className="invite-orb invite-orb-2" />
+
+      <header className="invite-hero">
+        <p className="invite-eyebrow">TEAM ACCESS</p>
+        <h1 className="invite-title">Invitations</h1>
+        <p className="invite-subtitle">Generate secure invite links and onboard new collaborators quickly.</p>
+      </header>
+
+      <div className="row g-4 align-items-start">
+        <div className="col-lg-7">
+          <div className="invite-card">
+            <h2 className="invite-card-title">Create Invite Link</h2>
+            <p className="invite-card-subtitle">Optionally target a specific email or create a general shareable link.</p>
+
+            <form onSubmit={handleCreateInvite} className="invite-form">
+              <label className="invite-label">Invite email (optional)</label>
+              <div className="invite-form-row">
+                <input
+                  type="email"
+                  className="form-control invite-input"
+                  placeholder="name@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <button className="btn invite-create-btn" disabled={creating}>
+                  {creating ? 'Creating...' : 'Create Invite'}
+                </button>
+              </div>
             </form>
 
             {inviteLink ? (
-              <div className="border rounded p-3 bg-light">
-                <p className="mb-2 fw-semibold">Invite link</p>
-                <code className="d-block mb-2" style={{ wordBreak: 'break-all' }}>
-                  {inviteLink}
-                </code>
-                <button className="btn btn-sm btn-outline-secondary" onClick={copyLink}>
-                  Copy Link
-                </button>
+              <div className="invite-result">
+                <p className="invite-result-title">Invite link ready</p>
+                <code className="invite-link-code">{inviteLink}</code>
+                <div className="invite-result-actions">
+                  <button className="btn invite-copy-btn" onClick={copyLink}>
+                    Copy Link
+                  </button>
+                </div>
+                <p className="invite-note">You can share this directly or send it by email.</p>
               </div>
             ) : (
-              <p className="text-muted mb-0">Create an invitation to get a shareable link.</p>
+              <div className="invite-empty">
+                No link yet. Create your first invitation to generate a shareable onboarding URL.
+              </div>
             )}
           </div>
         </div>
+
+        <div className="col-lg-5">
+          <aside className="invite-info-card">
+            <h3>How It Works</h3>
+            <ul>
+              <li>Create an invite with or without an email address.</li>
+              <li>Share the generated URL with the participant.</li>
+              <li>They accept invite and get immediate access.</li>
+            </ul>
+
+            <div className="invite-tip">
+              Tip: Leave email blank when you need a reusable link for private channels.
+            </div>
+          </aside>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

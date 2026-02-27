@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 import { getErrorMessage } from '../utils/http.js';
+import '../styles/auth.css';
 
 export default function AuthPage({ mode }) {
   const navigate = useNavigate();
@@ -32,62 +33,110 @@ export default function AuthPage({ mode }) {
     }
   }
 
+  const isRegister = mode === 'register';
+
   return (
-    <div className="row justify-content-center">
-      <div className="col-md-6 col-lg-5">
-        <div className="card shadow-sm">
-          <div className="card-body p-4">
-            <h1 className="h4 mb-3">{mode === 'register' ? 'Create account' : 'Sign in'}</h1>
+    <section className="auth-shell">
+      <div className="auth-orb auth-orb-1" />
+      <div className="auth-orb auth-orb-2" />
+      <div className="auth-layout">
+        <aside className="auth-brand-panel">
+          <p className="auth-eyebrow">EVENT SCHEDULER</p>
+          <h1 className="auth-title">Plan smarter events</h1>
+          <p className="auth-intro">
+            One workspace for scheduling, invitations, and AI-assisted planning that keeps everyone aligned.
+          </p>
+
+          <ul className="auth-value-list">
+            <li>Track events with search, filters, and live status updates.</li>
+            <li>Share secure invitation links and onboard attendees in minutes.</li>
+            <li>Use built-in AI tools for agendas, suggestions, and conflict checks.</li>
+          </ul>
+
+          <p className="auth-trust-note">Secure auth • CSRF protected • Private event data</p>
+        </aside>
+
+        <section className="auth-form-panel">
+          <div className="auth-card">
+            <div className="auth-switch">
+              <Link className={!isRegister ? 'active' : ''} to="/login">
+                Sign in
+              </Link>
+              <Link className={isRegister ? 'active' : ''} to="/register">
+                Create account
+              </Link>
+            </div>
+
+            <h2 className="auth-form-title">{isRegister ? 'Create your account' : 'Welcome back'}</h2>
+            <p className="auth-form-subtitle">
+              {isRegister
+                ? 'Start managing events, invites, and schedules in one place.'
+                : 'Sign in to continue planning and managing your events.'}
+            </p>
+
             <form onSubmit={handleSubmit} className="d-grid gap-3">
-              {mode === 'register' ? (
-                <div>
+              {isRegister ? (
+                <div className="auth-field">
                   <label className="form-label">Name</label>
-                  <input
-                    className="form-control"
-                    value={form.name}
-                    onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-                    required
-                  />
+                  <div className="auth-input-wrap">
+                    <span className="auth-input-icon" aria-hidden="true">
+                      N
+                    </span>
+                    <input
+                      className="form-control auth-input"
+                      value={form.name}
+                      onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                      required
+                    />
+                  </div>
                 </div>
               ) : null}
 
-              <div>
+              <div className="auth-field">
                 <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  value={form.email}
-                  onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-                  required
-                />
+                <div className="auth-input-wrap">
+                  <span className="auth-input-icon" aria-hidden="true">
+                    @
+                  </span>
+                  <input
+                    type="email"
+                    className="form-control auth-input"
+                    value={form.email}
+                    onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
+              <div className="auth-field">
                 <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  value={form.password}
-                  onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
-                  required
-                  minLength={8}
-                />
+                <div className="auth-input-wrap">
+                  <span className="auth-input-icon" aria-hidden="true">
+                    *
+                  </span>
+                  <input
+                    type="password"
+                    className="form-control auth-input"
+                    value={form.password}
+                    onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
+                    required
+                    minLength={8}
+                  />
+                </div>
               </div>
 
-              <button className="btn btn-primary" disabled={busy}>
-                {busy ? 'Please wait...' : mode === 'register' ? 'Register' : 'Login'}
+              <button className="btn auth-submit-btn" disabled={busy}>
+                {busy ? 'Please wait...' : isRegister ? 'Create Account' : 'Sign In'}
               </button>
             </form>
 
-            <p className="mt-3 mb-0 text-muted">
-              {mode === 'register' ? 'Already have an account?' : "Don't have an account?"}{' '}
-              <Link to={mode === 'register' ? '/login' : '/register'}>
-                {mode === 'register' ? 'Login' : 'Register'}
-              </Link>
+            <p className="auth-footer-link">
+              {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
+              <Link to={isRegister ? '/login' : '/register'}>{isRegister ? 'Sign in' : 'Create one'}</Link>
             </p>
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </section>
   );
 }

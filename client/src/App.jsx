@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import AppNavbar from './components/AppNavbar.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -12,11 +12,13 @@ import ToastViewport from './components/ToastViewport.jsx';
 
 export default function App() {
   const { user } = useAuth();
+  const location = useLocation();
+  const isAuthRoute = location.pathname === '/login' || location.pathname === '/register';
 
   return (
     <div className="min-vh-100 bg-light">
       <AppNavbar />
-      <main className="container py-4">
+      <main className={isAuthRoute ? 'container-fluid py-3 px-md-4' : 'container py-4'}>
         <Routes>
           <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <AuthPage mode="login" />} />
           <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <AuthPage mode="register" />} />

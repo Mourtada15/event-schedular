@@ -11,9 +11,11 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:remote": "concurrently \"npm run dev:server\" \"npm run dev:client:remote\"",
     "install:all": "npm install --prefix server && npm install --prefix client",
     "dev:server": "npm --prefix server run dev",
     "dev:client": "npm --prefix client run dev",
+    "dev:client:remote": "npm --prefix client run dev:remote",
     "start:server": "npm --prefix server run start",
     "build:client": "npm --prefix client run build"
   },

@@ -5,13 +5,22 @@ import rateLimit from 'express-rate-limit';
 import { env } from '../config/env.js';
 
 export function applySecurity(app) {
+  const allowedOrigins = new Set(env.clientOrigins);
+  const corsOptions = env.isProduction
+    ? {
+        origin(origin, callback) {
+          if (!origin) return callback(null, true);
+          return callback(null, allowedOrigins.has(origin));
+        },
+        credentials: true
+      }
+    : {
+        origin: true,
+        credentials: true
+      };
+
   app.use(helmet());
-  app.use(
-    cors({
-      origin: env.clientOrigin,
-      credentials: true
-    })
-  );
+  app.use(cors(corsOptions));
   app.use(
     '/api',
     rateLimit({

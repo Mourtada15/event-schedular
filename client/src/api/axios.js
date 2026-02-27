@@ -87,8 +87,14 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     const status = error.response?.status;
+    const requestUrl = String(originalRequest?.url || '');
+    const shouldSkipRefresh =
+      requestUrl.includes('/auth/login') ||
+      requestUrl.includes('/auth/register') ||
+      requestUrl.includes('/auth/refresh') ||
+      requestUrl.includes('/auth/csrf');
 
-    if (status === 401 && !originalRequest?._retry && !originalRequest?.url?.includes('/auth/refresh')) {
+    if (status === 401 && !shouldSkipRefresh && !originalRequest?._retry) {
       originalRequest._retry = true;
 
       try {

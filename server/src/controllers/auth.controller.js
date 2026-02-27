@@ -95,3 +95,7 @@ export async function refresh(req, res, next) {
     return next(error);
   }
 }
+
+export function csrfToken(req, res) {
+  return ok(res, { csrfToken: req.cookies.csrfToken || null });
+}

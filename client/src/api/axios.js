@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const configuredBaseURL = import.meta.env.VITE_API_BASE_URL;
+function normalizeApiBaseUrl(value) {
+  if (!value || !value.trim()) return '';
+  const trimmed = value.trim().replace(/\/+$/, '');
+  return /\/api$/i.test(trimmed) ? trimmed : `${trimmed}/api`;
+}
+
+const configuredBaseURL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
 const runtimeBaseURL =
   typeof window !== 'undefined'
     ? `${window.location.protocol}//${window.location.hostname}:5000/api`

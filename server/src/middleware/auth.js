@@ -1,9 +1,20 @@
 import { verifyAccessToken } from '../utils/jwt.js';
 import { fail } from '../utils/response.js';
 
+function getBearerToken(req) {
+  const header = req.get('authorization') || '';
+  const [scheme, token] = header.split(' ');
+
+  if (!/^Bearer$/i.test(scheme) || !token) {
+    return null;
+  }
+
+  return token;
+}
+
 export function requireAuth(req, res, next) {
   try {
-    const token = req.cookies.accessToken;
+    const token = getBearerToken(req);
     if (!token) return fail(res, 401, 'Unauthorized');
 
     const payload = verifyAccessToken(token);
@@ -18,7 +29,7 @@ export function requireAuth(req, res, next) {
 
 export function optionalAuth(req, _res, next) {
   try {
-    const token = req.cookies.accessToken;
+    const token = getBearerToken(req);
     if (!token) {
       req.user = null;
       return next();

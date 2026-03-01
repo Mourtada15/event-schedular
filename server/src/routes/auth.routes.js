@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { csrfToken, register, login, logout, me, refresh } from '../controllers/auth.controller.js';
+import { register, login, logout, me, refresh } from '../controllers/auth.controller.js';
 import { requireAuth } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 
@@ -17,9 +17,16 @@ const loginSchema = z.object({
   password: z.string().min(8).max(128)
 });
 
+const refreshSchema = z.object({
+  refreshToken: z.string().min(1)
+});
+
+const logoutSchema = z.object({
+  refreshToken: z.string().min(1).optional()
+});
+
 authRouter.post('/register', validate(registerSchema), register);
 authRouter.post('/login', validate(loginSchema), login);
-authRouter.get('/csrf', csrfToken);
-authRouter.post('/logout', logout);
+authRouter.post('/logout', validate(logoutSchema), logout);
 authRouter.get('/me', requireAuth, me);
-authRouter.post('/refresh', refresh);
+authRouter.post('/refresh', validate(refreshSchema), refresh);

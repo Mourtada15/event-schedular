@@ -33,7 +33,6 @@ export const env = {
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || defaultRefreshSecret,
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || '15m',
   refreshTokenTtlDays: Number(process.env.REFRESH_TOKEN_TTL_DAYS || 7),
-  cookieSecure: process.env.COOKIE_SECURE === 'true',
   openAiApiKey: process.env.OPENAI_API_KEY || '',
   smtpHost: process.env.SMTP_HOST || '',
   smtpPort: Number(process.env.SMTP_PORT || 0),

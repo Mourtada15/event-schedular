@@ -12,9 +12,8 @@ Production-ready monorepo app for scheduling events with authentication, invitat
 ### Core Requirements
 - [x] Monorepo with `/server` and `/client`
 - [x] JavaScript-only implementation (no TypeScript)
-- [x] JWT auth with access + refresh cookies (httpOnly)
-- [x] CSRF protection using double-submit token strategy
-- [x] Security middleware: `helmet`, `cors` (credentials), rate limit, mongo sanitize
+- [x] JWT auth with bearer access + refresh tokens
+- [x] Security middleware: `helmet`, `cors`, rate limit, mongo sanitize
 - [x] Input validation via `zod`
 - [x] Consistent JSON API shape: `{ ok, data | error }`
 
@@ -55,7 +54,7 @@ Production-ready monorepo app for scheduling events with authentication, invitat
 - [x] Invitations (create + copy link) page
 - [x] Accept invite page
 - [x] Navbar, loading states, empty states, toast notifications
-- [x] Axios with `withCredentials: true` and 401 refresh retry handling
+- [x] Axios bearer auth with 401 refresh retry handling
 
 ## API Summary
 
@@ -67,9 +66,9 @@ Base URL: `/api`
 ### Auth
 - `POST /api/auth/register { name, email, password }`
 - `POST /api/auth/login { email, password }`
-- `POST /api/auth/logout`
-- `GET /api/auth/me`
-- `POST /api/auth/refresh`
+- `POST /api/auth/logout { refreshToken? }`
+- `GET /api/auth/me` with `Authorization: Bearer <accessToken>`
+- `POST /api/auth/refresh { refreshToken }`
 
 ### Events (auth required)
 - `GET /api/events?query=&status=&from=&to=&location=&tags=tag1,tag2&page=&limit=&sort=`
@@ -155,7 +154,6 @@ npm run dev:client
 - `JWT_REFRESH_SECRET`
 - `ACCESS_TOKEN_TTL` (default `15m`)
 - `REFRESH_TOKEN_TTL_DAYS` (default `7`)
-- `COOKIE_SECURE` (`true` in production)
 - `OPENAI_API_KEY` (optional)
 - `SMTP_HOST` (optional)
 - `SMTP_PORT` (optional)
@@ -187,7 +185,6 @@ npm run dev:client
    - `CLIENT_ORIGIN=https://<your-vercel-app>.vercel.app`
    - `JWT_ACCESS_SECRET=<strong_secret_min_32_chars>`
    - `JWT_REFRESH_SECRET=<strong_secret_min_32_chars>`
-   - `COOKIE_SECURE=true`
    - `OPENAI_API_KEY=<optional>`
    - `SMTP_*` variables (optional)
 
@@ -203,19 +200,16 @@ Production startup validation:
    - `VITE_API_BASE_URL=https://<your-render-service>.onrender.com/api`
 3. Deploy.
 
-## Cross-site cookies for Vercel <-> Render
+## Cross-origin SPA Auth
 
 - Server CORS uses:
   - `origin = CLIENT_ORIGIN` allowlist (comma-separated)
-  - `credentials = true`
-- Axios uses `withCredentials: true`
-- In production cookies are set with:
-  - `SameSite=None`
-  - `Secure=true`
+- Client sends:
+  - `Authorization: Bearer <accessToken>`
+- Auth refresh uses:
+  - `POST /api/auth/refresh { refreshToken }`
 
 ## Quick Sanity Test (curl)
-
-Use a cookie jar so auth cookies persist.
 
 ### Health
 ```bash
@@ -224,21 +218,28 @@ curl -i http://localhost:5000/api/health
 
 ### Register
 ```bash
-curl -i -c cookies.txt -H "Content-Type: application/json" \
+curl -i -H "Content-Type: application/json" \
   -d '{"name":"Demo User","email":"demo@example.com","password":"password123"}' \
   http://localhost:5000/api/auth/register
 ```
 
 ### Fetch current user
+Use the `accessToken` returned by login/register.
 ```bash
-curl -i -b cookies.txt http://localhost:5000/api/auth/me
+curl -i -H "Authorization: Bearer <accessToken>" \
+  http://localhost:5000/api/auth/me
 ```
 
-### Create event (with CSRF header)
-1) Get CSRF token value from `cookies.txt` (`csrfToken`).
-2) Call:
+### Refresh tokens
 ```bash
-curl -i -b cookies.txt -H "x-csrf-token: <csrfToken>" -H "Content-Type: application/json" \
+curl -i -H "Content-Type: application/json" \
+  -d '{"refreshToken":"<refreshToken>"}' \
+  http://localhost:5000/api/auth/refresh
+```
+
+### Create event
+```bash
+curl -i -H "Authorization: Bearer <accessToken>" -H "Content-Type: application/json" \
   -d '{"title":"Team Sync","startAt":"2026-03-01T10:00:00.000Z","endAt":"2026-03-01T11:00:00.000Z","location":"Room A","description":"Weekly sync","status":"upcoming","tags":["team"]}' \
   http://localhost:5000/api/events
 ```

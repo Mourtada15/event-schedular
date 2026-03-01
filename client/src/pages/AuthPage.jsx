@@ -53,7 +53,7 @@ export default function AuthPage({ mode }) {
             <li>Use built-in AI tools for agendas, suggestions, and conflict checks.</li>
           </ul>
 
-          <p className="auth-trust-note">Secure auth • CSRF protected • Private event data</p>
+          <p className="auth-trust-note">Secure auth • Token-based sessions • Private event data</p>
         </aside>
 
         <section className="auth-form-panel">

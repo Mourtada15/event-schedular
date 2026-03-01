@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAuthSession, getAccessToken, getRefreshToken, setAuthSession } from '../utils/authSession.js';
 
 function normalizeApiBaseUrl(value) {
   if (!value || !value.trim()) return '';
@@ -14,62 +15,33 @@ const runtimeBaseURL =
 const baseURL = configuredBaseURL || runtimeBaseURL;
 
 const api = axios.create({
-  baseURL,
-  withCredentials: true
+  baseURL
 });
 
-const csrfClient = axios.create({
-  baseURL,
-  withCredentials: true
+const refreshClient = axios.create({
+  baseURL
 });
 
-function getCookie(name) {
-  const value = document.cookie
-    .split('; ')
-    .find((cookie) => cookie.startsWith(`${name}=`));
-
-  return value ? decodeURIComponent(value.split('=')[1]) : null;
+function shouldSkipAuthHeader(url) {
+  const value = String(url || '');
+  return value.includes('/auth/login') || value.includes('/auth/register') || value.includes('/auth/refresh');
 }
 
-let csrfTokenMemory = null;
-
-function needsCsrfHeader(config) {
-  const method = (config.method || 'get').toUpperCase();
-  if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) return false;
-
-  const url = String(config.url || '');
-  if (url.includes('/auth/login') || url.includes('/auth/register') || url.includes('/auth/csrf')) {
-    return false;
-  }
-
-  return true;
+function shouldSkipRefresh(url) {
+  const value = String(url || '');
+  return (
+    value.includes('/auth/login') ||
+    value.includes('/auth/register') ||
+    value.includes('/auth/refresh')
+  );
 }
 
-async function resolveCsrfToken() {
-  const cookieToken = getCookie('csrfToken');
-  if (cookieToken) return cookieToken;
-
-  try {
-    const response = await csrfClient.get('/auth/csrf');
-    return response.data?.data?.csrfToken || null;
-  } catch {
-    return null;
-  }
-}
-
-api.interceptors.request.use(async (config) => {
-  const method = (config.method || 'get').toUpperCase();
-  if (needsCsrfHeader(config)) {
-    if (!csrfTokenMemory) {
-      csrfTokenMemory = await resolveCsrfToken();
+api.interceptors.request.use((config) => {
+  if (!shouldSkipAuthHeader(config.url)) {
+    const accessToken = getAccessToken();
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
-
-    const csrfToken = csrfTokenMemory;
-    if (csrfToken) {
-      config.headers['x-csrf-token'] = csrfToken;
-    }
-  } else if (method === 'GET' && String(config.url || '').includes('/auth/csrf')) {
-    config.headers['x-csrf-token'] = undefined;
   }
 
   return config;
@@ -79,8 +51,9 @@ let refreshPromise = null;
 
 api.interceptors.response.use(
   (response) => {
-    if (String(response.config?.url || '').includes('/auth/logout')) {
-      csrfTokenMemory = null;
+    const tokens = response.data?.data?.tokens;
+    if (tokens?.accessToken && tokens?.refreshToken) {
+      setAuthSession(tokens);
     }
     return response;
   },
@@ -88,27 +61,38 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response?.status;
     const requestUrl = String(originalRequest?.url || '');
-    const shouldSkipRefresh =
-      requestUrl.includes('/auth/login') ||
-      requestUrl.includes('/auth/register') ||
-      requestUrl.includes('/auth/refresh') ||
-      requestUrl.includes('/auth/csrf');
 
-    if (status === 401 && !shouldSkipRefresh && !originalRequest?._retry) {
+    if (status === 401 && !shouldSkipRefresh(requestUrl) && !originalRequest?._retry) {
+      const refreshToken = getRefreshToken();
+      if (!refreshToken) {
+        clearAuthSession();
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
 
       try {
         if (!refreshPromise) {
-          refreshPromise = api.post('/auth/refresh').finally(() => {
-            refreshPromise = null;
-          });
+          refreshPromise = refreshClient
+            .post('/auth/refresh', { refreshToken })
+            .then((response) => {
+              const tokens = response.data?.data?.tokens;
+              if (!tokens?.accessToken || !tokens?.refreshToken) {
+                throw new Error('Missing refreshed tokens');
+              }
+
+              setAuthSession(tokens);
+              return tokens;
+            })
+            .finally(() => {
+              refreshPromise = null;
+            });
         }
 
         await refreshPromise;
-        csrfTokenMemory = null;
         return api(originalRequest);
       } catch (refreshError) {
-        csrfTokenMemory = null;
+        clearAuthSession();
         if (!window.location.pathname.includes('/login')) {
           window.location.href = '/login';
         }

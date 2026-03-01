@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import api from '../api/axios.js';
+import { clearAuthSession, getRefreshToken, hasAuthSession } from '../utils/authSession.js';
 
 const AuthContext = createContext(null);
 
@@ -9,10 +10,17 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     async function bootstrap() {
+      if (!hasAuthSession()) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
       try {
         const response = await api.get('/auth/me');
         setUser(response.data.data.user);
       } catch {
+        clearAuthSession();
         setUser(null);
       } finally {
         setLoading(false);
@@ -35,7 +43,13 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    await api.post('/auth/logout');
+    const refreshToken = getRefreshToken();
+    try {
+      await api.post('/auth/logout', refreshToken ? { refreshToken } : {});
+    } catch {
+      // Clear local auth state even if token revocation fails.
+    }
+    clearAuthSession();
     setUser(null);
   }
 

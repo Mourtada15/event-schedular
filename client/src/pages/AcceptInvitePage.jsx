@@ -8,7 +8,7 @@ import { getErrorMessage } from '../utils/http.js';
 export default function AcceptInvitePage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { user, refreshCurrentUser } = useAuth();
+  const { user, refreshCurrentUser, setUser } = useAuth();
   const toast = useToast();
 
   const token = useMemo(() => params.get('token') || '', [params]);
@@ -19,8 +19,15 @@ export default function AcceptInvitePage() {
   async function submit(payload) {
     setBusy(true);
     try {
-      await api.post('/invites/accept', payload);
-      await refreshCurrentUser().catch(() => null);
+      const response = await api.post('/invites/accept', payload);
+      const nextUser = response.data?.data?.user;
+
+      if (nextUser) {
+        setUser(nextUser);
+      } else {
+        await refreshCurrentUser().catch(() => null);
+      }
+
       toast.success('Invitation accepted');
       navigate('/dashboard');
     } catch (error) {

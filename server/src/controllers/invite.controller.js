@@ -99,7 +99,7 @@ export async function acceptInvite(req, res, next) {
     invitation.acceptedAt = new Date();
     await invitation.save();
 
-    await createSession(res, user._id.toString());
+    const tokens = await createSession(user._id.toString());
 
     return ok(
       res,
@@ -109,7 +109,8 @@ export async function acceptInvite(req, res, next) {
           name: user.name,
           email: user.email,
           invitedBy: user.invitedBy
-        }
+        },
+        tokens
       },
       201
     );

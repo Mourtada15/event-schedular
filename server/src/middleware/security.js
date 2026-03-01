@@ -11,13 +11,9 @@ export function applySecurity(app) {
         origin(origin, callback) {
           if (!origin) return callback(null, true);
           return callback(null, allowedOrigins.has(origin));
-        },
-        credentials: true
+        }
       }
-    : {
-        origin: true,
-        credentials: true
-      };
+    : { origin: true };
 
   app.use(helmet());
   app.use(cors(corsOptions));

@@ -21,7 +21,6 @@
     "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "^4.59.0",
     "@vitejs/plugin-react": "^4.3.2",
     "vite": "^5.4.8"
   }
